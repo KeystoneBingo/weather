@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather — Muncy, PA</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f4f0;
+  --surface:#ffffff;
+  --surface2:#fafaf7;
+  --border:rgba(0,0,0,0.09);
+  --border-mid:rgba(0,0,0,0.15);
+  --text:#1a1a18;
+  --text2:#555550;
+  --text3:#999990;
+  --blue-fill:#B5D4F4;
+  --blue-stroke:#378ADD;
+  --blue-text:#0C447C;
+  --blue-bg:#E6F1FB;
+  --amber-fill:#FAC775;
+  --amber-stroke:#EF9F27;
+  --gray-fill:#D3D1C7;
+  --gray-stroke:#B4B2A9;
+  --gray-dark:#888780;
+  --r:12px;
+  --r-sm:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;align-items:flex-start;justify-content:center;min-height:100vh;padding:2rem 1rem}
+.widget{width:100%;max-width:480px}
+.loading{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:14px}
+.spinner{width:28px;height:28px;border:2px solid var(--border-mid);border-top-color:var(--blue-stroke);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{background:var(--surface);border:0.5px solid var(--border-mid);border-radius:var(--r);padding:1.5rem;text-align:center;color:var(--text2);font-size:14px}
+
+/* MAIN CARD */
+.wx-main{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.5rem;margin-bottom:10px;display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.wx-left{}
+.wx-location{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.wx-temp-row{display:flex;align-items:flex-start;gap:4px;margin-bottom:6px}
+.wx-temp{font-size:64px;font-weight:500;line-height:1;color:var(--text)}
+.wx-unit{font-size:26px;color:var(--text3);margin-top:6px}
+.wx-cond{font-size:14px;color:var(--text2)}
+.wx-right{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wx-big-icon{}
+
+/* DETAIL STRIP */
+.wx-details{background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:10px 14px;margin-bottom:10px;display:grid;grid-template-columns:1fr 1fr;gap:0}
+.wx-det{padding:6px 0;border-bottom:0.5px solid var(--border)}
+.wx-det:nth-last-child(-n+2){border-bottom:none}
+.wx-det-label{font-size:11px;color:var(--text3);margin-bottom:2px}
+.wx-det-val{font-size:13px;font-weight:500;color:var(--text)}
+
+/* FORECAST */
+.wx-forecast{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.wx-day{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:10px 6px;text-align:center}
+.wx-day.today{border-color:var(--blue-stroke);background:var(--blue-bg)}
+.wx-day-name{font-size:11px;font-weight:600;letter-spacing:0.04em;color:var(--text3);margin-bottom:8px}
+.wx-day.today .wx-day-name{color:var(--blue-text)}
+.wx-day-hi{font-size:15px;font-weight:500;color:var(--text);margin-top:6px}
+.wx-day.today .wx-day-hi{color:var(--blue-text)}
+.wx-day-precip{font-size:10px;margin-top:4px;padding:2px 5px;border-radius:8px;display:inline-block;font-weight:500}
+.precip-lo{background:var(--surface2);color:var(--text3)}
+.precip-md{background:var(--blue-bg);color:var(--blue-text)}
+.precip-hi{background:var(--blue-stroke);color:#fff}
+.precip-snow{background:#E8F4FB;color:#1a5a8a}
+
+/* UPDATED */
+.wx-footer{font-size:11px;color:var(--text3);text-align:right;padding-right:2px}
+.wx-refresh{background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;padding:0;margin-left:8px;text-decoration:underline}
+.wx-refresh:hover{color:var(--text2)}
+</style>
+</head>
+<body>
+
+<div class="widget">
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    Fetching weather for Muncy, PA...
+  </div>
+  <div id="weatherContent" style="display:none"></div>
+</div>
+
+<script>
+const CONFIG = {
+  lat: 41.2045,
+  lon: -76.7858,
+  location: 'Muncy, PA',
+  tz: 'America/New_York'
+};
+
+const WMO = {
+  0:{label:'Clear sky',icon:'sunny'},
+  1:{label:'Mainly clear',icon:'mostly_sunny'},
+  2:{label:'Partly cloudy',icon:'partly_cloudy'},
+  3:{label:'Overcast',icon:'cloudy'},
+  45:{label:'Foggy',icon:'cloudy'},
+  48:{label:'Icy fog',icon:'cloudy'},
+  51:{label:'Light drizzle',icon:'rainy'},
+  53:{label:'Drizzle',icon:'rainy'},
+  55:{label:'Heavy drizzle',icon:'rainy'},
+  61:{label:'Light rain',icon:'rainy'},
+  63:{label:'Rain',icon:'rainy'},
+  65:{label:'Heavy rain',icon:'rainy'},
+  71:{label:'Light snow',icon:'snowy'},
+  73:{label:'Snow',icon:'snowy'},
+  75:{label:'Heavy snow',icon:'snowy'},
+  77:{label:'Snow grains',icon:'snowy'},
+  80:{label:'Light showers',icon:'rainy'},
+  81:{label:'Showers',icon:'rainy'},
+  82:{label:'Heavy showers',icon:'rainy'},
+  85:{label:'Snow showers',icon:'snowy'},
+  86:{label:'Heavy snow showers',icon:'snowy'},
+  95:{label:'Thunderstorm',icon:'stormy'},
+  96:{label:'Thunderstorm w/ hail',icon:'stormy'},
+  99:{label:'Thunderstorm w/ hail',icon:'stormy'},
+};
+
+function cToF(c){return Math.round(c*9/5+32);}
+
+function getIcon(type, size=40, isDay=true){
+  const s = size, h = size, cx = s/2, cy = s/2;
+  if(type==='sunny'){
+    return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none">
+      <circle cx="${cx}" cy="${cy}" r="${s*0.22}" fill="#FAC775" stroke="#EF9F27" stroke-width="${s*0.04}"/>
+      ${[0,45,90,135,180,225,270,315].map(a=>{
+        const r1=s*0.32, r2=s*0.44;
+        const x1=cx+r1*Math.cos(a*Math.PI/180), y1=cy+r1*Math.sin(a*Math.PI/180);
+        const x2=cx+r2*Math.cos(a*Math.PI/180), y2=cy+r2*Math.sin(a*Math.PI/180);
+        return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#EF9F27" stroke-width="${s*0.05}" stroke-linecap="round"/>`;
+      }).join('')}
+    </svg>`;
+  }
+  if(type==='mostly_sunny'||type==='partly_cloudy'){
+    const sunCx=cx*0.9, sunCy=cy*0.7, sunR=s*0.18;
+    return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none">
+      <circle cx="${sunCx}" cy="${sunCy}" r="${sunR}" fill="#FAC775" stroke="#EF9F27" stroke-width="${s*0.03}"/>
+      ${[0,60,120,180,240,300].map(a=>{
+        const r1=sunR+s*0.04, r2=sunR+s*0.1;
+        const x1=sunCx+r1*Math.cos(a*Math.PI/180), y1=sunCy+r1*Math.sin(a*Math.PI/180);
+        const x2=sunCx+r2*Math.cos(a*Math.PI/180), y2=sunCy+r2*Math.sin(a*Math.PI/180);
+        return `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#EF9F27" stroke-width="${s*0.04}" stroke-linecap="round"/>`;
+      }).join('')}
+      <path d="M${s*0.1} ${h*0.72} Q${s*0.1} ${h*0.45} ${s*0.35} ${h*0.45} Q${s*0.38} ${h*0.3} ${s*0.58} ${h*0.3} Q${s*0.8} ${h*0.3} ${s*0.82} ${h*0.5} Q${s*0.95} ${h*0.52} ${s*0.95} ${h*0.72} Z" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="${s*0.025}"/>
+    </svg>`;
+  }
+  if(type==='cloudy'){
+    return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none">
+      <path d="M${s*0.06} ${h*0.75} Q${s*0.06} ${h*0.44} ${s*0.32} ${h*0.44} Q${s*0.36} ${h*0.25} ${s*0.6} ${h*0.25} Q${s*0.85} ${h*0.25} ${s*0.87} ${h*0.48} Q${s*0.98} ${h*0.5} ${s*0.98} ${h*0.68} Q${s*0.98} ${h*0.75} ${s*0.9} ${h*0.75} Z" fill="#B4B2A9" stroke="#888780" stroke-width="${s*0.025}"/>
+    </svg>`;
+  }
+  if(type==='rainy'){
+    return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none">
+      <path d="M${s*0.06} ${h*0.6} Q${s*0.06} ${h*0.3} ${s*0.32} ${h*0.3} Q${s*0.36} ${h*0.12} ${s*0.6} ${h*0.12} Q${s*0.85} ${h*0.12} ${s*0.87} ${h*0.34} Q${s*0.98} ${h*0.36} ${s*0.98} ${h*0.54} Q${s*0.98} ${h*0.6} ${s*0.9} ${h*0.6} Z" fill="#B4B2A9" stroke="#888780" stroke-width="${s*0.025}"/>
+      ${[[0.2,0.75],[0.38,0.82],[0.56,0.75],[0.74,0.82],[0.85,0.75]].map(([x,y])=>`<circle cx="${s*x}" cy="${h*y}" r="${s*0.04}" fill="#378ADD"/>`).join('')}
+      ${[[0.29,0.9],[0.47,0.97],[0.65,0.9]].map(([x,y])=>`<circle cx="${s*x}" cy="${h*y}" r="${s*0.04}" fill="#378ADD"/>`).join('')}
+    </svg>`;
+  }
+  if(type==='snowy'){
+    return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none">
+      <path d="M${s*0.06} ${h*0.6} Q${s*0.06} ${h*0.3} ${s*0.32} ${h*0.3} Q${s*0.36} ${h*0.12} ${s*0.6} ${h*0.12} Q${s*0.85} ${h*0.12} ${s*0.87} ${h*0.34} Q${s*0.98} ${h*0.36} ${s*0.98} ${h*0.54} Q${s*0.98} ${h*0.6} ${s*0.9} ${h*0.6} Z" fill="#D3D1C7" stroke="#B4B2A9" stroke-width="${s*0.025}"/>
+      ${[[0.2,0.75],[0.38,0.82],[0.56,0.75],[0.74,0.82],[0.85,0.75]].map(([x,y])=>`<circle cx="${s*x}" cy="${h*y}" r="${s*0.04}" fill="#B5D4F4"/>`).join('')}
+      ${[[0.29,0.9],[0.47,0.97],[0.65,0.9]].map(([x,y])=>`<circle cx="${s*x}" cy="${h*y}" r="${s*0.04}" fill="#B5D4F4"/>`).join('')}
+    </svg>`;
+  }
+  if(type==='stormy'){
+    return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none">
+      <path d="M${s*0.06} ${h*0.58} Q${s*0.06} ${h*0.28} ${s*0.32} ${h*0.28} Q${s*0.36} ${h*0.1} ${s*0.6} ${h*0.1} Q${s*0.85} ${h*0.1} ${s*0.87} ${h*0.32} Q${s*0.98} ${h*0.34} ${s*0.98} ${h*0.52} Q${s*0.98} ${h*0.58} ${s*0.9} ${h*0.58} Z" fill="#888780" stroke="#5F5E5A" stroke-width="${s*0.025}"/>
+      <polyline points="${s*0.48},${h*0.6} ${s*0.38},${h*0.78} ${s*0.52},${h*0.78} ${s*0.42},${h*0.97}" stroke="#EF9F27" stroke-width="${s*0.06}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>`;
+  }
+  return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none"><circle cx="${cx}" cy="${cy}" r="${s*0.3}" fill="#D3D1C7"/></svg>`;
+}
+
+function getDayName(dateStr, short=true){
+  const d = new Date(dateStr+'T12:00:00');
+  return d.toLocaleDateString('en-US',{weekday: short?'short':'long'});
+}
+
+function precipClass(pct){
+  if(pct>=60) return 'precip-hi';
+  if(pct>=30) return 'precip-md';
+  return 'precip-lo';
+}
+
+function precipLabel(pct, type){
+  if(type==='snow'||type==='snow_grains') return `<span class="wx-day-precip precip-snow">${pct}% snow</span>`;
+  return `<span class="wx-day-precip ${precipClass(pct)}">${pct}%</span>`;
+}
+
+function windDir(deg){
+  const dirs=['N','NE','E','SE','S','SW','W','NW'];
+  return dirs[Math.round(deg/45)%8];
+}
+
+async function fetchWeather(){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${CONFIG.lat}&longitude=${CONFIG.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,is_day&daily=weather_code,temperature_2m_max,precipitation_probability_max,precipitation_sum&wind_speed_unit=mph&temperature_unit=fahrenheit&timezone=${encodeURIComponent(CONFIG.tz)}&forecast_days=5`;
+
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('API error');
+  return await res.json();
+}
+
+function render(data){
+  const c = data.current;
+  const d = data.daily;
+  const wmo = WMO[c.weather_code] || {label:'Unknown',icon:'cloudy'};
+  const temp = Math.round(c.temperature_2m);
+  const feels = Math.round(c.apparent_temperature);
+  const humidity = Math.round(c.relative_humidity_2m);
+  const wind = Math.round(c.wind_speed_10m);
+  const windD = windDir(c.wind_direction_10m);
+  const todayHi = Math.round(d.temperature_2m_max[0]);
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  const dateStr = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+
+  const forecastHTML = d.temperature_2m_max.map((hi, i) => {
+    const dayWmo = WMO[d.weather_code[i]] || {label:'',icon:'cloudy'};
+    const precip = Math.round(d.precipitation_probability_max[i]);
+    const isToday = i===0;
+    const precipType = d.precipitation_sum && d.precipitation_sum[i]>0 && (d.weather_code[i]>=71&&d.weather_code[i]<=77) ? 'snow' : 'rain';
+    return `<div class="wx-day${isToday?' today':''}">
+      <div class="wx-day-name">${isToday?'Today':getDayName(d.time[i])}</div>
+      ${getIcon(dayWmo.icon, 28, true)}
+      <div class="wx-day-hi">${Math.round(hi)}°</div>
+      ${precipLabel(precip, precipType)}
+    </div>`;
+  }).join('');
+
+  document.getElementById('weatherContent').innerHTML = `
+    <div class="wx-main">
+      <div class="wx-left">
+        <div class="wx-location">${CONFIG.location}</div>
+        <div class="wx-temp-row">
+          <div class="wx-temp">${temp}</div>
+          <div class="wx-unit">°F</div>
+        </div>
+        <div class="wx-cond">${wmo.label}</div>
+      </div>
+      <div class="wx-right">
+        ${getIcon(wmo.icon, 72, c.is_day===1)}
+      </div>
+    </div>
+    <div class="wx-details">
+      <div class="wx-det"><div class="wx-det-label">Today's high</div><div class="wx-det-val">${todayHi}°F</div></div>
+      <div class="wx-det"><div class="wx-det-label">Feels like</div><div class="wx-det-val">${feels}°F</div></div>
+      <div class="wx-det"><div class="wx-det-label">Humidity</div><div class="wx-det-val">${humidity}%</div></div>
+      <div class="wx-det"><div class="wx-det-label">Wind</div><div class="wx-det-val">${wind} mph ${windD}</div></div>
+    </div>
+    <div class="wx-forecast">${forecastHTML}</div>
+    <div class="wx-footer">
+      Updated ${dateStr} at ${timeStr}
+      <button class="wx-refresh" onclick="init()">Refresh</button>
+    </div>
+  `;
+  document.getElementById('loading').style.display='none';
+  document.getElementById('weatherContent').style.display='block';
+}
+
+async function init(){
+  document.getElementById('loading').style.display='block';
+  document.getElementById('weatherContent').style.display='none';
+  try {
+    const data = await fetchWeather();
+    render(data);
+  } catch(e) {
+    document.getElementById('loading').innerHTML = `<div class="error">Unable to load weather data.<br><small style="color:var(--text3);margin-top:6px;display:block">Check your connection and <button class="wx-refresh" onclick="init()">try again</button>.</small></div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
