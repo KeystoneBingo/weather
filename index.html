@@ -23,6 +23,12 @@
   --amber-stroke:#EF9F27;
   --r:12px;
   --r-sm:8px;
+  /* alert colors */
+  --warn-extreme-bg:#2d0a0a;--warn-extreme-border:#ff3b30;--warn-extreme-text:#ff8a80;--warn-extreme-title:#ff3b30;
+  --warn-severe-bg:#2d1500;--warn-severe-border:#ff6b00;--warn-severe-text:#ffb366;--warn-severe-title:#ff6b00;
+  --warn-moderate-bg:#2a2000;--warn-moderate-border:#ffc107;--warn-moderate-text:#ffe57a;--warn-moderate-title:#ffc107;
+  --warn-minor-bg:#0d1f0d;--warn-minor-border:#4caf50;--warn-minor-text:#a5d6a7;--warn-minor-title:#4caf50;
+  --warn-unknown-bg:#1a1a18;--warn-unknown-border:#888780;--warn-unknown-text:#ccc;--warn-unknown-title:#ccc;
 }
 body{font-family:'DM Sans',sans-serif;background:#f5f4f0;display:flex;align-items:flex-start;justify-content:center;min-height:100vh;padding:2rem 1rem}
 .widget{width:100%;max-width:960px}
@@ -30,6 +36,50 @@ body{font-family:'DM Sans',sans-serif;background:#f5f4f0;display:flex;align-item
 @media(max-width:600px){.wx-grid{grid-template-columns:1fr}}
 .wx-panel{display:flex;flex-direction:column;gap:8px}
 .section-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);text-align:center;padding-top:4px}
+
+/* alerts */
+.wx-alerts{display:flex;flex-direction:column;gap:6px}
+.wx-alert{border-radius:var(--r-sm);border-left:3px solid;padding:8px 10px;position:relative;overflow:hidden}
+.wx-alert.sev-Extreme{background:var(--warn-extreme-bg);border-color:var(--warn-extreme-border)}
+.wx-alert.sev-Severe{background:var(--warn-severe-bg);border-color:var(--warn-severe-border)}
+.wx-alert.sev-Moderate{background:var(--warn-moderate-bg);border-color:var(--warn-moderate-border)}
+.wx-alert.sev-Minor{background:var(--warn-minor-bg);border-color:var(--warn-minor-border)}
+.wx-alert.sev-Unknown,.wx-alert.sev-undefined{background:var(--warn-unknown-bg);border-color:var(--warn-unknown-border)}
+.wx-alert-head{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.wx-alert-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sev-Extreme .wx-alert-dot{background:var(--warn-extreme-title)}
+.sev-Severe  .wx-alert-dot{background:var(--warn-severe-title)}
+.sev-Moderate .wx-alert-dot{background:var(--warn-moderate-title)}
+.sev-Minor   .wx-alert-dot{background:var(--warn-minor-title)}
+.sev-Unknown .wx-alert-dot,.sev-undefined .wx-alert-dot{background:var(--warn-unknown-title)}
+.wx-alert-title{font-size:11px;font-weight:600;letter-spacing:0.04em}
+.sev-Extreme  .wx-alert-title{color:var(--warn-extreme-title)}
+.sev-Severe   .wx-alert-title{color:var(--warn-severe-title)}
+.sev-Moderate .wx-alert-title{color:var(--warn-moderate-title)}
+.sev-Minor    .wx-alert-title{color:var(--warn-minor-title)}
+.sev-Unknown  .wx-alert-title,.sev-undefined .wx-alert-title{color:var(--warn-unknown-title)}
+.wx-alert-body{font-size:11px;line-height:1.5;max-height:80px;overflow:hidden;position:relative;transition:max-height .3s ease}
+.wx-alert-body.expanded{max-height:600px}
+.sev-Extreme  .wx-alert-body{color:var(--warn-extreme-text)}
+.sev-Severe   .wx-alert-body{color:var(--warn-severe-text)}
+.sev-Moderate .wx-alert-body{color:var(--warn-moderate-text)}
+.sev-Minor    .wx-alert-body{color:var(--warn-minor-text)}
+.sev-Unknown  .wx-alert-body,.sev-undefined .wx-alert-body{color:var(--warn-unknown-text)}
+.wx-alert-toggle{font-size:10px;background:none;border:none;cursor:pointer;padding:3px 0 0;font-family:'DM Sans',sans-serif;opacity:0.7}
+.wx-alert-toggle:hover{opacity:1}
+.sev-Extreme  .wx-alert-toggle{color:var(--warn-extreme-text)}
+.sev-Severe   .wx-alert-toggle{color:var(--warn-severe-text)}
+.sev-Moderate .wx-alert-toggle{color:var(--warn-moderate-text)}
+.sev-Minor    .wx-alert-toggle{color:var(--warn-minor-text)}
+.sev-Unknown  .wx-alert-toggle,.sev-undefined .wx-alert-toggle{color:var(--warn-unknown-text)}
+.wx-no-alerts{font-size:11px;color:var(--text3);background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;display:flex;align-items:center;gap:5px}
+.wx-no-alerts::before{content:'✓';font-size:10px;color:#4caf50}
+
+/* summary narrative */
+.wx-summary{background:var(--surface2);border:0.5px solid var(--border);border-radius:var(--r-sm);padding:10px 12px}
+.wx-summary-label{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.wx-summary-text{font-size:12px;line-height:1.6;color:var(--text2)}
+
 .wx-main{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:1.25rem;display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem}
 .wx-location{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:2px}
 .wx-localtime{font-size:10px;color:var(--text3);margin-bottom:6px}
@@ -75,14 +125,14 @@ body{font-family:'DM Sans',sans-serif;background:#f5f4f0;display:flex;align-item
     </div>
   </div>
   <div class="wx-footer" id="wxFooter" style="display:none">
-    <button class="wx-refresh" onclick="initAll()">Refresh</button>
+    <span id="wxTimestamp"></span> · <button class="wx-refresh" onclick="initAll()">Refresh</button>
   </div>
 </div>
 
 <script>
 const LOCATIONS = [
-  {id:'muncy',    name:'Muncy, PA',          lat:41.2045,  lon:-76.7858, tz:'America/New_York'},
-  {id:'angeles',  name:'Angeles City, PH',   lat:15.1450,  lon:120.5887, tz:'Asia/Manila'},
+  {id:'muncy',   name:'Muncy, PA',        lat:41.2045, lon:-76.7858, tz:'America/New_York', nwsPoint:'CTP/88,98'},
+  {id:'angeles', name:'Angeles City, PH', lat:15.1450, lon:120.5887, tz:'Asia/Manila',      nwsPoint:null},
 ];
 
 const WMO = {
@@ -97,6 +147,201 @@ function windDir(deg){return ['N','NE','E','SE','S','SW','W','NW'][Math.round(de
 function getDayName(dateStr){const d=new Date(dateStr+'T12:00:00');return d.toLocaleDateString('en-US',{weekday:'short'});}
 function precipClass(p){return p>=60?'precip-hi':p>=30?'precip-md':'precip-lo';}
 function getLocalTime(tz){try{return new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:tz});}catch(e){return '';}}
+function visibilityLabel(vis_m){
+  if(vis_m===null||vis_m===undefined) return null;
+  const mi=(vis_m/1609.34);
+  if(mi<0.25) return 'near-zero visibility';
+  if(mi<1) return `${mi.toFixed(1)}-mile visibility`;
+  if(mi<3) return `${Math.round(mi)}-mile visibility (reduced)`;
+  if(mi>=10) return null; // don't mention if clear
+  return `${Math.round(mi)}-mile visibility`;
+}
+function dewpointComfort(dp_c){
+  const dp_f=dp_c*9/5+32;
+  if(dp_f>=75) return 'oppressively humid';
+  if(dp_f>=70) return 'very humid';
+  if(dp_f>=65) return 'humid';
+  if(dp_f>=60) return 'somewhat muggy';
+  if(dp_f>=55) return 'comfortable';
+  if(dp_f>=45) return 'pleasant';
+  return 'dry';
+}
+function cloudCoverLabel(cc){
+  if(cc<=10) return 'clear skies';
+  if(cc<=25) return 'mostly clear';
+  if(cc<=50) return 'partly cloudy';
+  if(cc<=75) return 'mostly cloudy';
+  return 'overcast';
+}
+
+/* Build a natural-language current conditions summary */
+function buildSummary(c, hourly, loc){
+  const temp=Math.round(c.temperature_2m);
+  const feels=Math.round(c.apparent_temperature);
+  const humidity=c.relative_humidity_2m;
+  const wind=Math.round(c.wind_speed_10m);
+  const wDir=windDir(c.wind_direction_10m);
+  const wmo=WMO[c.weather_code]||{label:'conditions unknown',icon:'cloudy'};
+  const isDay=c.is_day;
+
+  // pull current-hour hourly values
+  const now=new Date();
+  const hourlyIdx=hourly ? hourly.time.findIndex(t=>{
+    const d=new Date(t); return d.getHours()===now.getHours();
+  }) : -1;
+
+  let vis=null, cc=null, dp=null, precip_mm=null, gustVal=null;
+  if(hourlyIdx>=0&&hourly){
+    vis=hourly.visibility?.[hourlyIdx]??null;
+    cc=hourly.cloud_cover?.[hourlyIdx]??null;
+    dp=hourly.dew_point_2m?.[hourlyIdx]??null;
+    precip_mm=hourly.precipitation?.[hourlyIdx]??null;
+    gustVal=hourly.wind_gusts_10m?.[hourlyIdx]??null;
+  }
+
+  const parts=[];
+
+  // lead: condition + temp
+  const feelsNote=Math.abs(feels-temp)>=5?`, feeling like ${feels}°`:'';
+  parts.push(`${wmo.label.toLowerCase()} with a temperature of ${temp}°F${feelsNote}.`);
+
+  // cloud cover / sky detail
+  if(cc!==null) parts.push(`Skies are ${cloudCoverLabel(cc)}.`);
+
+  // precipitation happening?
+  if(precip_mm!==null&&precip_mm>0){
+    const intensity=precip_mm<1?'light':precip_mm<4?'moderate':'heavy';
+    const type=(c.weather_code>=71&&c.weather_code<=86)?'snowfall':'rainfall';
+    parts.push(`${intensity.charAt(0).toUpperCase()+intensity.slice(1)} ${type} is occurring (${precip_mm.toFixed(1)} mm this hour).`);
+  }
+
+  // wind
+  if(wind>25){
+    const gustNote=gustVal&&gustVal>wind+5?` with gusts to ${Math.round(gustVal)} mph`:'';
+    parts.push(`Winds are strong out of the ${wDir} at ${wind} mph${gustNote}.`);
+  } else if(wind>10){
+    const gustNote=gustVal&&gustVal>wind+5?`, gusting to ${Math.round(gustVal)} mph`:'';
+    parts.push(`A ${wDir} wind at ${wind} mph${gustNote}.`);
+  } else if(wind>0){
+    parts.push(`Light winds from the ${wDir} at ${wind} mph.`);
+  } else {
+    parts.push('Winds are calm.');
+  }
+
+  // humidity / comfort
+  if(dp!==null){
+    const comfort=dewpointComfort(dp);
+    parts.push(`Humidity is ${humidity}% — ${comfort} conditions.`);
+  } else {
+    parts.push(`Relative humidity is ${humidity}%.`);
+  }
+
+  // visibility
+  if(vis!==null){
+    const vl=visibilityLabel(vis);
+    if(vl) parts.push(`${vl.charAt(0).toUpperCase()+vl.slice(1)}.`);
+  }
+
+  return parts.join(' ');
+}
+
+/* ── NWS alerts (US only) ── */
+async function fetchNWSAlerts(loc){
+  if(!loc.lat||!loc.lon) return [];
+  try {
+    const url=`https://api.weather.gov/alerts/active?point=${loc.lat},${loc.lon}&status=actual&message_type=alert,update,cancel`;
+    const res=await fetch(url,{headers:{Accept:'application/geo+json','User-Agent':'weather-widget/1.0'}});
+    if(!res.ok) return [];
+    const data=await res.json();
+    return (data.features||[]).map(f=>({
+      title: f.properties.event||'Alert',
+      severity: f.properties.severity||'Unknown',
+      urgency: f.properties.urgency||'Unknown',
+      headline: f.properties.headline||'',
+      description: (f.properties.description||'').replace(/\n\n+/g,'\n').trim(),
+      onset: f.properties.onset,
+      ends: f.properties.ends||f.properties.expires,
+    }));
+  } catch(e){ return []; }
+}
+
+/* Synthesize PH-style notice from conditions */
+function buildPHNotice(c, hourly){
+  const notices=[];
+  const hourlyIdx=hourly ? hourly.time.findIndex(t=>{
+    const now=new Date(); const d=new Date(t); return d.getHours()===now.getHours();
+  }) : -1;
+
+  // thunderstorm
+  if(c.weather_code>=95) notices.push({title:'Thunderstorm Activity',severity:'Severe',headline:'Active thunderstorm in the area. Lightning risk is elevated.',description:'A thunderstorm is currently occurring. Avoid open areas and seek shelter indoors. Do not use corded phones or electrical appliances. Remain away from windows.'});
+
+  // heavy rain
+  const precip_mm=hourlyIdx>=0&&hourly?.precipitation?.[hourlyIdx]||0;
+  if(precip_mm>=5) notices.push({title:'Heavy Rainfall',severity:'Moderate',headline:`Intense rainfall of ${precip_mm.toFixed(1)} mm this hour — flooding possible.`,description:'Heavy rain can cause localized flooding and poor road conditions. Avoid low-lying areas and dry riverbeds.'});
+
+  // strong wind
+  const gust=hourlyIdx>=0&&hourly?.wind_gusts_10m?.[hourlyIdx]||0;
+  if(gust>=45) notices.push({title:'Strong Wind Advisory',severity:gust>=65?'Severe':'Moderate',headline:`Wind gusts to ${Math.round(gust)} mph detected.`,description:'Strong wind gusts may cause damage to unsecured objects and make driving difficult. Secure loose items outdoors.'});
+
+  // extreme heat
+  const feels=Math.round(c.apparent_temperature);
+  if(feels>=105) notices.push({title:'Extreme Heat Index',severity:'Severe',headline:`Heat index of ${feels}°F — dangerous heat.`,description:'Dangerous heat index levels. Limit outdoor activity, stay hydrated, and seek air-conditioned spaces. Watch for signs of heat exhaustion and heat stroke.'});
+  else if(feels>=95) notices.push({title:'High Heat Index',severity:'Moderate',headline:`Heat index of ${feels}°F — heat precautions advised.`,description:'Elevated heat index. Drink plenty of fluids, wear lightweight clothing, and limit strenuous outdoor activity during peak afternoon hours.'});
+
+  return notices;
+}
+
+function formatAlertTime(iso){
+  if(!iso) return null;
+  try{return new Date(iso).toLocaleString('en-US',{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
+  catch(e){return null;}
+}
+
+function renderAlerts(alerts, container){
+  if(!alerts||alerts.length===0){
+    container.innerHTML=`<div class="wx-no-alerts">No active alerts or watches</div>`;
+    return;
+  }
+  // sort by severity weight
+  const sevOrder={Extreme:0,Severe:1,Moderate:2,Minor:3,Unknown:4};
+  alerts.sort((a,b)=>(sevOrder[a.severity]??4)-(sevOrder[b.severity]??4));
+
+  container.innerHTML=alerts.map((al,i)=>{
+    const ends=formatAlertTime(al.ends);
+    const onset=formatAlertTime(al.onset);
+    const timeNote=[onset?`Onset: ${onset}`:null, ends?`Expires: ${ends}`:null].filter(Boolean).join(' · ');
+    const bodyText=[al.headline, timeNote, al.description].filter(Boolean).join('\n\n');
+    return `<div class="wx-alert sev-${al.severity}">
+      <div class="wx-alert-head">
+        <div class="wx-alert-dot"></div>
+        <div class="wx-alert-title">${al.title}</div>
+      </div>
+      <div class="wx-alert-body" id="al-body-${i}">${bodyText.replace(/\n/g,'<br>')}</div>
+      <button class="wx-alert-toggle" id="al-btn-${i}" onclick="toggleAlert(${i})">Show more ▾</button>
+    </div>`;
+  }).join('');
+}
+
+function toggleAlert(i){
+  const body=document.getElementById('al-body-'+i);
+  const btn=document.getElementById('al-btn-'+i);
+  if(!body||!btn) return;
+  const expanded=body.classList.toggle('expanded');
+  btn.textContent=expanded?'Show less ▴':'Show more ▾';
+}
+
+/* Open-Meteo fetch (now with hourly for rich summary) */
+async function fetchWeather(loc){
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}`
+    +`&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,is_day`
+    +`&hourly=temperature_2m,precipitation,cloud_cover,visibility,dew_point_2m,wind_gusts_10m`
+    +`&daily=weather_code,temperature_2m_max,precipitation_probability_max`
+    +`&wind_speed_unit=mph&temperature_unit=fahrenheit`
+    +`&timezone=${encodeURIComponent(loc.tz)}&forecast_days=5`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error('API error');
+  return res.json();
+}
 
 function getIcon(type, size=36){
   const s=size, h=size, cx=s/2, cy=s/2;
@@ -142,15 +387,8 @@ function getIcon(type, size=36){
   return `<svg width="${s}" height="${h}" viewBox="0 0 ${s} ${h}" fill="none"><circle cx="${cx}" cy="${cy}" r="${s*.3}" fill="#D3D1C7"/></svg>`;
 }
 
-async function fetchWeather(loc){
-  const url=`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,is_day&daily=weather_code,temperature_2m_max,precipitation_probability_max&wind_speed_unit=mph&temperature_unit=fahrenheit&timezone=${encodeURIComponent(loc.tz)}&forecast_days=5`;
-  const res=await fetch(url);
-  if(!res.ok) throw new Error('API error');
-  return res.json();
-}
-
-function renderPanel(loc, data){
-  const c=data.current, d=data.daily;
+function renderPanel(loc, wxData, alerts){
+  const c=wxData.current, d=wxData.daily, hourly=wxData.hourly||null;
   const wmo=WMO[c.weather_code]||{label:'Unknown',icon:'cloudy'};
   const temp=Math.round(c.temperature_2m);
   const feels=Math.round(c.apparent_temperature);
@@ -159,6 +397,13 @@ function renderPanel(loc, data){
   const windD=windDir(c.wind_direction_10m);
   const todayHi=Math.round(d.temperature_2m_max[0]);
   const localTime=getLocalTime(loc.tz);
+
+  // current-hour hourly detail
+  const now=new Date();
+  const hIdx=hourly ? hourly.time.findIndex(t=>{const dt=new Date(t);return dt.getHours()===now.getHours();}) : -1;
+  const gust=hIdx>=0&&hourly?.wind_gusts_10m?.[hIdx]?Math.round(hourly.wind_gusts_10m[hIdx]):null;
+  const vis=hIdx>=0&&hourly?.visibility?.[hIdx]??null;
+  const visMi=vis!==null?Math.round(vis/1609.34):null;
 
   const forecastHTML=d.temperature_2m_max.map((hi,i)=>{
     const dayWmo=WMO[d.weather_code[i]]||{label:'',icon:'cloudy'};
@@ -176,6 +421,26 @@ function renderPanel(loc, data){
     </div>`;
   }).join('');
 
+  // details grid rows — add gust & visibility if available
+  const detRows=[
+    {label:"Today's high", val:`${todayHi}°F`},
+    {label:'Feels like', val:`${feels}°F`},
+    {label:'Humidity', val:`${humidity}%`},
+    {label:'Wind', val:`${wind} mph ${windD}`},
+  ];
+  if(gust!==null&&gust>wind+4) detRows.push({label:'Gusts',val:`${gust} mph`});
+  if(visMi!==null) detRows.push({label:'Visibility',val:visMi>=10?'10+ mi':`${visMi} mi`});
+
+  const detHTML=detRows.map((r,i)=>`<div class="wx-det"><div class="wx-det-label">${r.label}</div><div class="wx-det-val">${r.val}</div></div>`).join('');
+
+  // narrative summary
+  const summary=buildSummary(c,hourly,loc);
+
+  // alert HTML
+  const alertEl=document.createElement('div');
+  alertEl.className='wx-alerts';
+  renderAlerts(alerts, alertEl);
+
   document.getElementById('wx-'+loc.id).innerHTML=`
     <div class="wx-main">
       <div>
@@ -186,14 +451,17 @@ function renderPanel(loc, data){
       </div>
       <div>${getIcon(wmo.icon, 60)}</div>
     </div>
-    <div class="wx-details">
-      <div class="wx-det"><div class="wx-det-label">Today's high</div><div class="wx-det-val">${todayHi}°F</div></div>
-      <div class="wx-det"><div class="wx-det-label">Feels like</div><div class="wx-det-val">${feels}°F</div></div>
-      <div class="wx-det"><div class="wx-det-label">Humidity</div><div class="wx-det-val">${humidity}%</div></div>
-      <div class="wx-det"><div class="wx-det-label">Wind</div><div class="wx-det-val">${wind} mph ${windD}</div></div>
+    <div class="wx-summary">
+      <div class="wx-summary-label">Current conditions</div>
+      <div class="wx-summary-text">${summary}</div>
     </div>
+    <div class="wx-details" style="grid-template-columns:${detRows.length>4?'1fr 1fr':'1fr 1fr'}">${detHTML}</div>
     <div class="wx-forecast">${forecastHTML}</div>
   `;
+
+  // insert alerts above the main card
+  const panel=document.getElementById('wx-'+loc.id);
+  panel.insertBefore(alertEl, panel.firstChild);
 }
 
 async function initAll(){
@@ -201,14 +469,25 @@ async function initAll(){
     document.getElementById('wx-'+loc.id).innerHTML=`<div class="wx-main skeleton"><div style="width:100%"><div class="skel-block" style="width:60%;height:40px;margin-bottom:8px"></div><div class="skel-block" style="width:80%"></div><div class="skel-block" style="width:50%"></div></div></div>`;
   });
   document.getElementById('wxFooter').style.display='none';
+
   await Promise.all(LOCATIONS.map(async loc=>{
     try{
-      const data=await fetchWeather(loc);
-      renderPanel(loc,data);
+      const [wxData, alerts] = await Promise.all([
+        fetchWeather(loc),
+        loc.nwsPoint!==null ? fetchNWSAlerts(loc) : Promise.resolve(null),
+      ]);
+
+      // For PH, synthesize notices from conditions
+      const finalAlerts = alerts !== null ? alerts : buildPHNotice(wxData.current, wxData.hourly||null);
+
+      renderPanel(loc, wxData, finalAlerts);
     }catch(e){
       document.getElementById('wx-'+loc.id).innerHTML=`<div class="wx-main" style="color:#555550;font-size:13px;">Unable to load weather. Check your connection.</div>`;
     }
   }));
+
+  const ts=document.getElementById('wxTimestamp');
+  if(ts) ts.textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
   document.getElementById('wxFooter').style.display='block';
 }
 
