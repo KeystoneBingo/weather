@@ -192,11 +192,11 @@ function buildSummary(c, hourly, loc){
 
   let vis=null, cc=null, dp=null, precip_mm=null, gustVal=null;
   if(hourlyIdx>=0&&hourly){
-    vis=hourly.visibility?.[hourlyIdx]??null;
-    cc=hourly.cloud_cover?.[hourlyIdx]??null;
-    dp=hourly.dew_point_2m?.[hourlyIdx]??null;
-    precip_mm=hourly.precipitation?.[hourlyIdx]??null;
-    gustVal=hourly.wind_gusts_10m?.[hourlyIdx]??null;
+    vis=(hourly.visibility&&hourly.visibility[hourlyIdx]!==undefined)?hourly.visibility[hourlyIdx]:null;
+    cc=(hourly.cloud_cover&&hourly.cloud_cover[hourlyIdx]!==undefined)?hourly.cloud_cover[hourlyIdx]:null;
+    dp=(hourly.dew_point_2m&&hourly.dew_point_2m[hourlyIdx]!==undefined)?hourly.dew_point_2m[hourlyIdx]:null;
+    precip_mm=(hourly.precipitation&&hourly.precipitation[hourlyIdx]!==undefined)?hourly.precipitation[hourlyIdx]:null;
+    gustVal=(hourly.wind_gusts_10m&&hourly.wind_gusts_10m[hourlyIdx]!==undefined)?hourly.wind_gusts_10m[hourlyIdx]:null;
   }
 
   const parts=[];
@@ -276,11 +276,11 @@ function buildPHNotice(c, hourly){
   if(c.weather_code>=95) notices.push({title:'Thunderstorm Activity',severity:'Severe',headline:'Active thunderstorm in the area. Lightning risk is elevated.',description:'A thunderstorm is currently occurring. Avoid open areas and seek shelter indoors. Do not use corded phones or electrical appliances. Remain away from windows.'});
 
   // heavy rain
-  const precip_mm=hourlyIdx>=0&&hourly?.precipitation?.[hourlyIdx]||0;
+  const precip_mm=hourlyIdx>=0&&hourly&&hourly.precipitation&&hourly.precipitation[hourlyIdx]?hourly.precipitation[hourlyIdx]:0;
   if(precip_mm>=5) notices.push({title:'Heavy Rainfall',severity:'Moderate',headline:`Intense rainfall of ${precip_mm.toFixed(1)} mm this hour — flooding possible.`,description:'Heavy rain can cause localized flooding and poor road conditions. Avoid low-lying areas and dry riverbeds.'});
 
   // strong wind
-  const gust=hourlyIdx>=0&&hourly?.wind_gusts_10m?.[hourlyIdx]||0;
+  const gust=hourlyIdx>=0&&hourly&&hourly.wind_gusts_10m&&hourly.wind_gusts_10m[hourlyIdx]?hourly.wind_gusts_10m[hourlyIdx]:0;
   if(gust>=45) notices.push({title:'Strong Wind Advisory',severity:gust>=65?'Severe':'Moderate',headline:`Wind gusts to ${Math.round(gust)} mph detected.`,description:'Strong wind gusts may cause damage to unsecured objects and make driving difficult. Secure loose items outdoors.'});
 
   // extreme heat
@@ -304,7 +304,7 @@ function renderAlerts(alerts, container){
   }
   // sort by severity weight
   const sevOrder={Extreme:0,Severe:1,Moderate:2,Minor:3,Unknown:4};
-  alerts.sort((a,b)=>(sevOrder[a.severity]??4)-(sevOrder[b.severity]??4));
+  alerts.sort((a,b)=>((sevOrder[a.severity]!==undefined?sevOrder[a.severity]:4))-(sevOrder[b.severity]!==undefined?sevOrder[b.severity]:4));
 
   container.innerHTML=alerts.map((al,i)=>{
     const ends=formatAlertTime(al.ends);
@@ -401,8 +401,8 @@ function renderPanel(loc, wxData, alerts){
   // current-hour hourly detail
   const now=new Date();
   const hIdx=hourly ? hourly.time.findIndex(t=>{const dt=new Date(t);return dt.getHours()===now.getHours();}) : -1;
-  const gust=hIdx>=0&&hourly?.wind_gusts_10m?.[hIdx]?Math.round(hourly.wind_gusts_10m[hIdx]):null;
-  const vis=hIdx>=0&&hourly?.visibility?.[hIdx]??null;
+  const gust=hIdx>=0&&hourly&&hourly.wind_gusts_10m&&hourly.wind_gusts_10m[hIdx]?Math.round(hourly.wind_gusts_10m[hIdx]):null;
+  const vis=hIdx>=0&&hourly&&hourly.visibility&&hourly.visibility[hIdx]!==undefined?hourly.visibility[hIdx]:null;
   const visMi=vis!==null?Math.round(vis/1609.34):null;
 
   const forecastHTML=d.temperature_2m_max.map((hi,i)=>{
